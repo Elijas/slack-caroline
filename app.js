@@ -1,35 +1,50 @@
-var SlackBot = require('slackbots');
-var Promise = require('bluebird');
+let SlackBot = require('slackbots');
+let Promise = require('bluebird');
+let Mitsuku = require('./mitsuku-api');
 
-// create a bot 
-var bot = new SlackBot({
-    token: '',
-    name: 'Karolina <3',
-});
-
-var params = {
-    icon_emoji: ':kiss:'
-};
+const mentionSubstring = 'Caroline, ';
 
 function doReplyToMessage(commObj, selfId) {
-    var isMessage = () => commObj.type === 'message' && Boolean(commObj.text);
-    var isDirectMessage = () => typeof commObj.channel === 'string' && commObj.channel[0] === 'D';
-    var messageNotFromSelf = () => commObj.subtype !== 'bot_message';
+    let isMessage = () => commObj.type === 'message' && Boolean(commObj.text);
+    let isDirectMessage = () => typeof commObj.channel === 'string' && commObj.channel[0] === 'D';
+    let isBotMentioned = () => commObj.text.includes(mentionSubstring);
+    let isMessageNotFromSelf = () => commObj.subtype !== 'bot_message';
 
-    return isMessage() && isDirectMessage() && messageNotFromSelf();
+    return isMessage() && (isDirectMessage() || isBotMentioned()) && isMessageNotFromSelf();
 }
 
 function getResponseText(requestText) {
-    return requestText;
+    return mitsuku.send(requestText)
+        .then(function(response) {
+            return response;
+        });
 }
 
-bot.on('message', function(commObj) {
+function logConversationItem(requestText, responseText, interlocutorName) {
+    console.log({ts: new Date(), usr: interlocutorName, req: requestText, res: responseText});
+}
+
+let slack = new SlackBot({
+    token: '',
+    name: 'Caroline <3',
+});
+
+let slackParams = {
+    icon_emoji: ':kiss:'
+};
+
+let mitsuku = Mitsuku();
+
+slack.on('message', function(commObj) {
     if (doReplyToMessage(commObj, this.self.id)) {
-        var interlocutorName = bot.users.find(i => i.id === commObj.user).name;
+        let interlocutorName = slack.users.find(i => i.id === commObj.user).name;
 
-        var responseText = getResponseText(commObj.text)
+        let requestText = commObj.text.replace(mentionSubstring, '');
 
-        return bot.postMessageToUser(interlocutorName, responseText, params)
-            .catch(err => console.log(err));
+        let responseTextPromise = getResponseText(requestText);
+        return responseTextPromise
+            .then(responseText => slack.postMessageToUser(interlocutorName, responseText, slackParams))
+            .then(() => responseTextPromise.then(responseText => logConversationItem(requestText, responseText, interlocutorName)))
+            .catch(err => console.error(err));
     }
 });
