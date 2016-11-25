@@ -25,7 +25,7 @@ function logConversationItem(requestText, responseText, interlocutorName) {
 }
 
 let slack = new SlackBot({
-    token: '',
+    token: process.env.SLACKBOT_API_KEY,
     name: 'Caroline <3',
 });
 

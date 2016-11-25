@@ -4,7 +4,7 @@ var Promise = require('bluebird'),
     cheerio = require('cheerio'),
     superagent = require('superagent');
 
-var ENDPOINT_CHAT_MITSUKU = 'https://kakko.pandorabots.com/pandora/talk?botid=f326d0be8e345a13&skin=chat',
+var ENDPOINT_CHAT_MITSUKU = process.env.ENDPOINT_CHAT_MITSUKU,
     MESSAGE_REGEX = /(Mitsuku:(.*))/,
     MESSAGE_REJECT_REGEX = /(x(.*)x[^\s]+)|(\|)|(BYESPLIT X1234)/ig,
     MESSAGE_SENDER_TAG = 'You:';
