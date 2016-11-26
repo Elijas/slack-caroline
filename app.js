@@ -1,10 +1,9 @@
 let SlackBot = require('slackbots');
-let Promise = require('bluebird');
 let Mitsuku = require('./mitsuku-api');
 
 const mentionSubstring = 'Caroline, ';
 
-function doReplyToMessage(commObj, selfId) {
+function doReplyToMessage(commObj) {
     let isMessage = () => commObj.type === 'message' && Boolean(commObj.text);
     let isDirectMessage = () => typeof commObj.channel === 'string' && commObj.channel[0] === 'D';
     let isBotMentioned = () => commObj.text.includes(mentionSubstring);
@@ -21,8 +20,10 @@ function getResponseText(requestText) {
 }
 
 function logConversationItem(requestText, responseText, interlocutorName) {
-    console.log({ts: new Date(), usr: interlocutorName, req: requestText, res: responseText});
+    console.log(JSON.stringify({usr: interlocutorName, req: requestText, res: responseText, ts: new Date()}));
 }
+
+require('express')().listen(process.env.PORT | 3000, () => {});
 
 let slack = new SlackBot({
     token: process.env.SLACKBOT_API_KEY,
