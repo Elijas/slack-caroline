@@ -23,7 +23,7 @@ function logConversationItem(requestText, responseText, interlocutorName) {
     console.log(JSON.stringify({usr: interlocutorName, req: requestText, res: responseText, ts: new Date()}));
 }
 
-require('express')().listen(process.env.PORT | 3000, () => {});
+require('express')().listen(process.env.PORT || 3000, () => {});
 
 let slack = new SlackBot({
     token: process.env.SLACKBOT_API_KEY,
