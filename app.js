@@ -16,7 +16,7 @@ function doReplyToMessage(commObj) {
 function getResponseText(requestText) {
     return mitsuku.send(requestText)
         .then(function(response) {
-            return response;
+            return response.replace('Mitsuku', 'Caroline');
         });
 }
 
