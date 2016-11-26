@@ -33,10 +33,6 @@ function sendReply(interlocutorName, responseText, slackParams, channel) {
     }
 }
 
-
-
-require('express')().listen(process.env.PORT || 3000, () => {});
-
 let slack = new SlackBot({
     token: process.env.SLACKBOT_API_KEY || '',
     name: 'Caroline <3',
