@@ -1,6 +1,6 @@
 let SlackBot = require('slackbots');
 let Mitsuku = require('./mitsuku-api');
-
+try { var config = require('./config.js'); } catch (err) {}
 const mentionRegex = /^(Caroline|C),/;
 
 function isDirectMessage(channel) {return typeof channel === 'string' && channel[0] === 'D'}
@@ -34,7 +34,7 @@ function sendReply(interlocutorName, responseText, slackParams, channel) {
 }
 
 let slack = new SlackBot({
-    token: process.env.SLACKBOT_API_KEY || '',
+    token: process.env.SLACKBOT_API_KEY || config.slackToken,
     name: 'Caroline <3',
 });
 
@@ -55,6 +55,7 @@ slack.on('message', function(commObj) {
             .then(() => responseTextPromise.then(responseText => logConversationItem(requestText, responseText, interlocutorName)))
             .catch(err => console.error(err));
     } else {
-        //console.log(commObj);
+        if ((config && config.debugFlag) || false)
+            console.log(commObj);
     }
 });
