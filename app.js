@@ -1,7 +1,6 @@
 let SlackBot = require('slackbots');
 let Mitsuku = require('./mitsuku-api');
-var config;
-//config = require('./config.js');
+try { var config = require('./config.js'); } catch (err) {}
 const mentionRegex = /^(Caroline|C),/;
 
 function isDirectMessage(channel) {return typeof channel === 'string' && channel[0] === 'D'}

@@ -1,6 +1,7 @@
 'use strict';
 
-var config = require('./config.js');
+try { var config = require('./config.js'); } catch (err) {}
+
 var Promise = require('bluebird'),
     cheerio = require('cheerio'),
     superagent = require('superagent');
