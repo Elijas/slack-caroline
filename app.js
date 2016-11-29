@@ -1,13 +1,13 @@
 let SlackBot = require('slackbots');
 let Mitsuku = require('./mitsuku-api');
 
-const mentionSubstring = 'Caroline, ';
+const mentionRegex = /^(Caroline|C) ,/;
 
-function isDirectMessage(channel) {return typeof channel === 'string' && channel[0] === 'D'};
+function isDirectMessage(channel) {return typeof channel === 'string' && channel[0] === 'D'}
 
 function doReplyToMessage(commObj) {
     let isMessage = () => commObj.type === 'message' && Boolean(commObj.text);
-    let isBotMentioned = () => commObj.text.includes(mentionSubstring);
+    let isBotMentioned = () => mentionRegex.test(commObj.text);
     let isMessageNotFromSelf = () => commObj.subtype !== 'bot_message';
 
     return isMessage() && (isDirectMessage(commObj.channel) || isBotMentioned()) && isMessageNotFromSelf();
@@ -46,7 +46,7 @@ let mitsuku = Mitsuku();
 
 slack.on('message', function(commObj) {
     if (doReplyToMessage(commObj, this.self.id)) {
-        let requestText = commObj.text.replace(mentionSubstring, '');
+        let requestText = commObj.text.replace(mentionRegex, '').trim();
 
         let interlocutorName = slack.users.find(i => i.id === commObj.user).name;
         let responseTextPromise = getResponseText(requestText);
@@ -54,5 +54,7 @@ slack.on('message', function(commObj) {
             .then(responseText => sendReply(interlocutorName, responseText, slackParams, commObj.channel))
             .then(() => responseTextPromise.then(responseText => logConversationItem(requestText, responseText, interlocutorName)))
             .catch(err => console.error(err));
+    } else {
+        //console.log(commObj);
     }
 });
